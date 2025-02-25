@@ -8,6 +8,18 @@ public class Main {
         test_whenInputIs4Lines_thenParse4Lines();
         test_whenInputIs0Lines_thenParse0Lines();
         test_whenInputIs1Line_thenParse1Line();
+        test_whenStartDateIsAfterEndDate_thenThrowException();
+
+        test_whenOverlapIs1Day_thenReturn1Day();
+        test_whenOverlapIs1DayReversed_thenReturn1Day();
+        test_whenOverlapIs0Days_thenReturn0Days();
+        test_whenOverlapIsComplete_thenReturnAllDays();
+        test_whenStartsOverlap_thenReturnMinDays();
+
+        test_when1OverlapIs2Days_then1WorkPeriodOf2Days();
+        test_when2EqualOverlapsOf2Days_then2WorkPeriodsOf2Days();
+        test_whenNoOverlap_thenNoWorkPeriods();
+        test_whenLargePeriodContainsSmaller_then1WorkPeriodOf2Days();
     }
 
     public static void test_whenDataIsCorrect_thenAssignmentIsParsed() {
@@ -15,10 +27,10 @@ public class Main {
 
         EmployeeAssignment assignment = EmployeeAssignment.fromString(input);
 
-        assert("143".equals(assignment.getEmployeeId()));
-        assert("12".equals(assignment.getProjectId()));
-        assert(LocalDate.parse("2013-11-01").equals(assignment.getStart()));
-        assert(LocalDate.parse("2014-01-05").equals(assignment.getEnd()));
+        assert ("143".equals(assignment.getEmployeeId()));
+        assert ("12".equals(assignment.getProjectId()));
+        assert (LocalDate.parse("2013-11-01").equals(assignment.getStart()));
+        assert (LocalDate.parse("2014-01-05").equals(assignment.getEnd()));
     }
 
     public static void test_whenEndDateIsNull_thenEndDateIsNow() {
@@ -26,7 +38,7 @@ public class Main {
 
         EmployeeAssignment assignment = EmployeeAssignment.fromString(input);
 
-        assert(LocalDate.now().equals(assignment.getEnd()));
+        assert (LocalDate.now().equals(assignment.getEnd()));
     }
 
     private static void test_whenInputIs4Lines_thenParse4Lines() {
@@ -38,20 +50,132 @@ public class Main {
                 """;
         List<EmployeeAssignment> assignments = new EmployeeService().parseAssignments(input);
 
-        assert(assignments.size() == 4);
+        assert (assignments.size() == 4);
     }
 
     private static void test_whenInputIs0Lines_thenParse0Lines() {
         String input = "";
         List<EmployeeAssignment> assignments = new EmployeeService().parseAssignments(input);
 
-        assert(assignments.isEmpty());
+        assert (assignments.isEmpty());
     }
 
     private static void test_whenInputIs1Line_thenParse1Line() {
         String input = "143, 12, 2013-11-01, 2014-01-05";
         List<EmployeeAssignment> assignments = new EmployeeService().parseAssignments(input);
 
-        assert(assignments.size() == 1);
+        assert (assignments.size() == 1);
+    }
+
+    private static void test_whenStartDateIsAfterEndDate_thenThrowException() {
+        String input = "143, 12, 2018-01-01, 2014-01-01";
+        try {
+            List<EmployeeAssignment> assignments = new EmployeeService().parseAssignments(input);
+        } catch (InvalidCsvException e) {
+            assert (e.getMessage().equals("Start date cannot be after end date: " + input));
+        }
+    }
+
+    public static void test_whenOverlapIs1Day_thenReturn1Day() {
+        EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
+        EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-04, 2000-01-09");
+
+        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+
+        assert (daysWorked == 1);
+    }
+
+    public static void test_whenOverlapIs1DayReversed_thenReturn1Day() {
+        EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
+        EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-04, 2000-01-09");
+
+        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment2, assignment1);
+
+        assert (daysWorked == 1);
+    }
+
+    public static void test_whenOverlapIs0Days_thenReturn0Days() {
+        EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
+        EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-05, 2000-01-09");
+
+        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+
+        assert (daysWorked == 0);
+    }
+
+    public static void test_whenOverlapIsComplete_thenReturnAllDays() {
+        EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
+        EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-01, 2000-01-05");
+
+        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+
+        assert (daysWorked == 4);
+    }
+
+    public static void test_whenStartsOverlap_thenReturnMinDays() {
+        EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
+        EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-01, 2000-01-09");
+
+        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+
+        assert (daysWorked == 4);
+    }
+
+    public static void test_when1OverlapIs2Days_then1WorkPeriodOf2Days() {
+        String input = """
+                143, 12, 2000-01-01, 2000-01-05
+                218, 12, 2000-01-03, 2000-01-09
+                """;
+        EmployeeService employeeService = new EmployeeService();
+        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+
+        List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
+
+        assert (longestTeamPeriods.size() == 1);
+        assert (longestTeamPeriods.get(0).daysWorked() == 2);
+        assert (longestTeamPeriods.get(0).projectId().equals("12"));
+    }
+
+    public static void test_when2EqualOverlapsOf2Days_then2WorkPeriodsOf2Days() {
+        String input = """
+                143, 12, 2000-01-01, 2000-01-05
+                218, 12, 2000-01-03, 2000-01-09
+                555, 12, 2000-01-07, 2000-01-09
+                """;
+        EmployeeService employeeService = new EmployeeService();
+        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+
+        List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
+
+        assert (longestTeamPeriods.size() == 2);
+        assert (longestTeamPeriods.get(0).daysWorked() == 2);
+    }
+
+    public static void test_whenNoOverlap_thenNoWorkPeriods() {
+        String input = """
+                143, 12, 2000-01-01, 2000-01-05
+                218, 12, 2000-01-06, 2000-01-09
+                """;
+        EmployeeService employeeService = new EmployeeService();
+        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+
+        List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
+
+        assert (longestTeamPeriods.isEmpty());
+    }
+
+    public static void test_whenLargePeriodContainsSmaller_then1WorkPeriodOf2Days() {
+        String input = """
+                143, 12, 2000-01-01, 2000-01-10
+                218, 12, 2000-01-04, 2000-01-06
+                """;
+        EmployeeService employeeService = new EmployeeService();
+        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+
+        List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
+
+        assert (longestTeamPeriods.size() == 1);
+        assert (longestTeamPeriods.get(0).daysWorked() == 2);
+        assert (longestTeamPeriods.get(0).projectId().equals("12"));
     }
 }
