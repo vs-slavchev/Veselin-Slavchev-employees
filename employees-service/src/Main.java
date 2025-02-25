@@ -1,3 +1,4 @@
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,6 +21,9 @@ public class Main {
         test_when2EqualOverlapsOf2Days_then2WorkPeriodsOf2Days();
         test_whenNoOverlap_thenNoWorkPeriods();
         test_whenLargePeriodContainsSmaller_then1WorkPeriodOf2Days();
+
+        test_timeUtil_whenSameDateInDifferentFormats_thenParseCorrectly();
+        test_timeUtil_whenDateIsInvalid_thenThrowException();
     }
 
     public static void test_whenDataIsCorrect_thenAssignmentIsParsed() {
@@ -80,7 +84,7 @@ public class Main {
         EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
         EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-04, 2000-01-09");
 
-        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+        int daysWorked = TimeUtil.getOverlappingTimePeriod(assignment1, assignment2);
 
         assert (daysWorked == 1);
     }
@@ -89,7 +93,7 @@ public class Main {
         EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
         EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-04, 2000-01-09");
 
-        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment2, assignment1);
+        int daysWorked = TimeUtil.getOverlappingTimePeriod(assignment2, assignment1);
 
         assert (daysWorked == 1);
     }
@@ -98,7 +102,7 @@ public class Main {
         EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
         EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-05, 2000-01-09");
 
-        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+        int daysWorked = TimeUtil.getOverlappingTimePeriod(assignment1, assignment2);
 
         assert (daysWorked == 0);
     }
@@ -107,7 +111,7 @@ public class Main {
         EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
         EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-01, 2000-01-05");
 
-        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+        int daysWorked = TimeUtil.getOverlappingTimePeriod(assignment1, assignment2);
 
         assert (daysWorked == 4);
     }
@@ -116,7 +120,7 @@ public class Main {
         EmployeeAssignment assignment1 = EmployeeAssignment.fromString("143, 12, 2000-01-01, 2000-01-05");
         EmployeeAssignment assignment2 = EmployeeAssignment.fromString("218, 12, 2000-01-01, 2000-01-09");
 
-        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment1, assignment2);
+        int daysWorked = TimeUtil.getOverlappingTimePeriod(assignment1, assignment2);
 
         assert (daysWorked == 4);
     }
@@ -177,5 +181,24 @@ public class Main {
         assert (longestTeamPeriods.size() == 1);
         assert (longestTeamPeriods.get(0).daysWorked() == 2);
         assert (longestTeamPeriods.get(0).projectId().equals("12"));
+    }
+
+    public static void test_timeUtil_whenSameDateInDifferentFormats_thenParseCorrectly() {
+        LocalDate date1 = TimeUtil.parseDate("2025-01-31");
+        LocalDate date2 = TimeUtil.parseDate("01/31/2025");
+        LocalDate date3 = TimeUtil.parseDate("31-01-2025");
+        LocalDate date4 = TimeUtil.parseDate("31.01.2025");
+
+        assert (date1.equals(date2));
+        assert (date2.equals(date3));
+        assert (date3.equals(date4));
+    }
+
+    public static void test_timeUtil_whenDateIsInvalid_thenThrowException() {
+        try {
+            TimeUtil.parseDate("2025-31-31");
+        } catch (DateTimeException e) {
+            assert (true);
+        }
     }
 }

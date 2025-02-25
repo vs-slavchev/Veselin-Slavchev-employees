@@ -39,7 +39,7 @@ public class EmployeeAssignment {
             throw new InvalidCsvException("Date is null");
         }
         stringDate = stringDate.trim();
-        return stringDate.equals("NULL") ? LocalDate.now() : LocalDate.parse(stringDate);
+        return stringDate.equals("NULL") ? LocalDate.now() : TimeUtil.parseDate(stringDate);
     }
 
     public String getEmployeeId() {

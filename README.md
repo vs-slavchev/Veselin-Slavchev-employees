@@ -31,3 +31,7 @@ The two services are on docker and can be started with docker-compose.
 
 ## out of scope
 Merging of time periods if there are multiple lines stating an employee worked on a project in different overlapping periods.
+
+## further steps
+ - monitor algo performance and optimise if necessary
+ - monitor parsing of various date formats and optimise if necessary

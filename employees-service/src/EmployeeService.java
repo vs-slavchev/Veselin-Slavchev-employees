@@ -35,7 +35,7 @@ public class EmployeeService {
     }
 
     private static void updateLongestTeamPeriod(EmployeeAssignment assignment, EmployeeAssignment otherAssignment, List<PairWorkPeriod> longestTeamPeriods) {
-        int daysWorked = TimePeriodUtil.getOverlappingTimePeriod(assignment, otherAssignment);
+        int daysWorked = TimeUtil.getOverlappingTimePeriod(assignment, otherAssignment);
         int maximumPeriod = longestTeamPeriods.isEmpty() ? 0 : longestTeamPeriods.get(0).daysWorked();
         if (daysWorked >= maximumPeriod && daysWorked > 0) {
             PairWorkPeriod newLongestWorkPeriod = new PairWorkPeriod(
