@@ -1,3 +1,7 @@
+package com.slavchev.employees.employees_service.util;
+
+import com.slavchev.employees.employees_service.model.EmployeeAssignment;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;

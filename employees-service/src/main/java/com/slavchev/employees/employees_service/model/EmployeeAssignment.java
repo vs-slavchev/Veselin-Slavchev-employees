@@ -1,3 +1,8 @@
+package com.slavchev.employees.employees_service.model;
+
+import com.slavchev.employees.employees_service.exceptions.InvalidCsvException;
+import com.slavchev.employees.employees_service.util.TimeUtil;
+
 import java.time.LocalDate;
 
 public class EmployeeAssignment {

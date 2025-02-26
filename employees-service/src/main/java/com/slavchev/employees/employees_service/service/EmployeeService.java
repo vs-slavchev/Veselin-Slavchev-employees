@@ -1,9 +1,17 @@
+package com.slavchev.employees.employees_service.service;
+
+import com.slavchev.employees.employees_service.model.EmployeeAssignment;
+import com.slavchev.employees.employees_service.model.PairWorkPeriod;
+import com.slavchev.employees.employees_service.util.TimeUtil;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Service
 public class EmployeeService {
 
     public List<EmployeeAssignment> parseAssignments(String input) {
