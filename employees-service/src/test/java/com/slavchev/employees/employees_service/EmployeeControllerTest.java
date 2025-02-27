@@ -11,6 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -43,7 +44,7 @@ public class EmployeeControllerTest {
                 .andExpect(content().contentType("application/json"));
 
         verify(this.employeeService).parseAssignments(input);
-        verify(this.employeeService).findLongestTeamPeriod(any(List.class));
+        verify(this.employeeService).findLongestTeamPeriod(any(Set.class));
     }
 
     @Test

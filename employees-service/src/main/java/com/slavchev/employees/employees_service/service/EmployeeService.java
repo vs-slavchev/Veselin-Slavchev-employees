@@ -9,22 +9,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
-    public List<EmployeeAssignment> parseAssignments(String input) {
+    public Set<EmployeeAssignment> parseAssignments(String input) {
         String[] lines = input.split("\n");
         if (lines.length <= 1 && lines[0].isBlank()) {
-            return List.of();
+            return Set.of();
         }
         return Arrays.stream(lines)
                 .map(EmployeeAssignment::fromString)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
-    public List<PairWorkPeriod> findLongestTeamPeriod(List<EmployeeAssignment> assignments) {
+    public List<PairWorkPeriod> findLongestTeamPeriod(Set<EmployeeAssignment> assignments) {
         Map<String, List<EmployeeAssignment>> assignmentsToProjects =
                 assignments.stream().collect(Collectors.groupingBy(EmployeeAssignment::getProjectId));
         List<PairWorkPeriod> longestTeamPeriods = new ArrayList<>();
@@ -34,6 +35,10 @@ public class EmployeeService {
                 EmployeeAssignment assignment = assignmentsInSameProject.get(i);
                 for (int j = i + 1; j < assignmentsInSameProject.size(); j++) {
                     EmployeeAssignment otherAssignment = assignmentsInSameProject.get(j);
+                    // same employee should not be checked against itself
+                    if (assignment.getEmployeeId().equals(otherAssignment.getEmployeeId())) {
+                        continue;
+                    }
 
                     updateLongestTeamPeriod(assignment, otherAssignment, longestTeamPeriods);
                 }

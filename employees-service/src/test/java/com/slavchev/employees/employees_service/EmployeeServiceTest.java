@@ -6,6 +6,7 @@ import com.slavchev.employees.employees_service.service.EmployeeService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 public class EmployeeServiceTest {
     private final EmployeeService employeeService = new EmployeeService();
@@ -16,7 +17,7 @@ public class EmployeeServiceTest {
                 143, 12, 2000-01-01, 2000-01-05
                 218, 12, 2000-01-03, 2000-01-09
                 """;
-        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+        Set<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
 
         List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
 
@@ -32,7 +33,7 @@ public class EmployeeServiceTest {
                 218, 12, 2000-01-03, 2000-01-09
                 555, 12, 2000-01-07, 2000-01-09
                 """;
-        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+        Set<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
 
         List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
 
@@ -46,7 +47,7 @@ public class EmployeeServiceTest {
                 143, 12, 2000-01-01, 2000-01-05
                 218, 12, 2000-01-06, 2000-01-09
                 """;
-        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+        Set<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
 
         List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
 
@@ -59,12 +60,38 @@ public class EmployeeServiceTest {
                 143, 12, 2000-01-01, 2000-01-10
                 218, 12, 2000-01-04, 2000-01-06
                 """;
-        List<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+        Set<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
 
         List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
 
         assert (longestTeamPeriods.size() == 1);
         assert (longestTeamPeriods.get(0).daysWorked() == 2);
         assert (longestTeamPeriods.get(0).projectId().equals("12"));
+    }
+
+    @Test
+    public void test_whenDuplicateLine_thenNoLongest() {
+        String input = """
+                218, 12, 2000-01-03, 2000-01-09
+                218, 12, 2000-01-03, 2000-01-09
+                """;
+        Set<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+
+        List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
+
+        assert (longestTeamPeriods.isEmpty());
+    }
+
+    @Test
+    public void test_whenOverlappingTimeForSameEmployee_thenNoLongest() {
+        String input = """
+                218, 12, 2000-01-03, 2000-01-09
+                218, 12, 2000-01-04, 2000-01-10
+                """;
+        Set<EmployeeAssignment> assignments = employeeService.parseAssignments(input);
+
+        List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(assignments);
+
+        assert (longestTeamPeriods.isEmpty());
     }
 }

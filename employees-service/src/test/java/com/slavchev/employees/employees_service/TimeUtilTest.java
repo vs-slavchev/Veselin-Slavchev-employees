@@ -1,5 +1,6 @@
 package com.slavchev.employees.employees_service;
 
+import com.slavchev.employees.employees_service.exceptions.InvalidCsvException;
 import com.slavchev.employees.employees_service.model.EmployeeAssignment;
 import com.slavchev.employees.employees_service.util.TimeUtil;
 import org.junit.jupiter.api.Test;
@@ -75,6 +76,6 @@ public class TimeUtilTest {
 
     @Test
     public void test_timeUtil_whenDateIsInvalid_thenThrowException() {
-        assertThrows(DateTimeException.class, () -> TimeUtil.parseDate("2025-31-31"));
+        assertThrows(InvalidCsvException.class, () -> TimeUtil.parseDate("2025-31-31"));
     }
 }

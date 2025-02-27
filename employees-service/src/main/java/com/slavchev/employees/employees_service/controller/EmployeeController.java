@@ -8,14 +8,17 @@ import com.slavchev.employees.employees_service.service.EmployeeService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Set;
 
 @Controller
+@CrossOrigin
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
     private final EmployeeService employeeService;
@@ -32,7 +35,7 @@ public class EmployeeController {
             @RequestParam("file") MultipartFile file) {
         String csvContent = csvService.handleUpload(file);
 
-        List<EmployeeAssignment> employeeAssignments = employeeService.parseAssignments(csvContent);
+        Set<EmployeeAssignment> employeeAssignments = employeeService.parseAssignments(csvContent);
         List<PairWorkPeriod> longestTeamPeriods = employeeService.findLongestTeamPeriod(employeeAssignments);
 
         List<PairWorkPeriodDto> dtos = longestTeamPeriods.stream()
