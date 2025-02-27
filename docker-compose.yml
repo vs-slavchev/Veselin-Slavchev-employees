@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+
+  employees-service:
+    build: ./employees-service
+    ports:
+      - "8080:8080"
+
+  webapp:
+    build: ./webapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      - employees-service
+

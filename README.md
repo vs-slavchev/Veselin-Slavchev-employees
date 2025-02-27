@@ -1,5 +1,9 @@
 # Employee interview coding task
 
+## Running locally
+1. `docker-compose up` in the root of the repo
+2. go to [localhost:3000](http://localhost:3000)
+
 ## Context
 An application that identifies the pair of employees who have worked together on common projects for the longest period of time.
 
